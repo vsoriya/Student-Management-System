@@ -64,6 +64,21 @@ Set these environment variables in Vercel:
 ```bash
 SECRET_KEY=your-production-secret
 DATABASE_URL=mysql+pymysql://USER:PASSWORD@HOST:PORT/student_db?charset=utf8mb4
+DEPLOY_SETUP_TOKEN=choose-a-long-random-token
+ADMIN_EMAIL=vseyhaksoriya@gmail.com
+ADMIN_PASSWORD=Soriya@12345
 ```
 
 Do not use `localhost` for Vercel MySQL. Use a hosted MySQL database such as PlanetScale, Aiven, Railway, Render, AWS RDS, or another public MySQL provider.
+
+After setting environment variables and redeploying, open:
+
+```text
+https://your-vercel-domain.vercel.app/healthz
+```
+
+Then initialize tables and the admin account once:
+
+```text
+https://your-vercel-domain.vercel.app/deployment/init?token=YOUR_DEPLOY_SETUP_TOKEN
+```

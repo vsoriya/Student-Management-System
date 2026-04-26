@@ -1,8 +1,9 @@
+import os
 import shutil
 from datetime import datetime
 from pathlib import Path
 
-from flask import Flask, redirect, url_for
+from flask import Flask, jsonify, redirect, request, url_for
 from dotenv import load_dotenv
 
 from config import Config
@@ -46,6 +47,39 @@ def create_app(config_class=Config):
     @app.route("/")
     def index():
         return redirect(url_for("students.dashboard"))
+
+    @app.route("/healthz")
+    def healthz():
+        try:
+            db.session.execute(db.text("SELECT 1"))
+            database = "ok"
+        except Exception as exc:
+            database = f"error: {exc.__class__.__name__}"
+        return jsonify(
+            {
+                "app": "ok",
+                "database": database,
+                "database_configured": bool(os.getenv("DATABASE_URL")),
+            }
+        )
+
+    @app.route("/deployment/init")
+    def deployment_init():
+        token = os.getenv("DEPLOY_SETUP_TOKEN")
+        if not token or request.args.get("token") != token:
+            return jsonify({"error": "invalid setup token"}), 403
+
+        db.create_all()
+        email = os.getenv("ADMIN_EMAIL", "vseyhaksoriya@gmail.com").strip().lower()
+        password = os.getenv("ADMIN_PASSWORD", "Soriya@12345")
+        admin = User.query.filter_by(email=email).first() or User(role="admin")
+        admin.name = os.getenv("ADMIN_NAME", "Admin")
+        admin.email = email
+        admin.role = "admin"
+        admin.set_password(password)
+        db.session.add(admin)
+        db.session.commit()
+        return jsonify({"status": "initialized", "admin_email": admin.email})
 
     @app.template_filter("km_role")
     def km_role(value):

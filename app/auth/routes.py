@@ -1,5 +1,6 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
 from app.models import User
@@ -13,7 +14,11 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for("students.dashboard"))
     if request.method == "POST":
-        user = User.query.filter_by(email=request.form.get("email", "").strip().lower()).first()
+        try:
+            user = User.query.filter_by(email=request.form.get("email", "").strip().lower()).first()
+        except SQLAlchemyError:
+            flash("ប្រព័ន្ធមិនអាចភ្ជាប់ទៅ Database បានទេ។ សូមពិនិត្យ DATABASE_URL និងបង្កើតតារាង Database នៅលើ Server។", "danger")
+            return render_template("login.html"), 503
         if user and user.check_password(request.form.get("password", "")):
             login_user(user)
             return redirect(url_for("students.dashboard"))
