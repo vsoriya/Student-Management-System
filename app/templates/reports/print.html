@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="km">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>កាតពិន្ទុសិស្ស</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 28px; color: #172033; }
+    header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f766e; padding-bottom: 14px; margin-bottom: 22px; }
+    h1, h2 { margin: 0; }
+    .card { page-break-inside: avoid; border: 1px solid #dbe3ef; border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+    .meta { color: #667085; margin: 6px 0 12px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { border-bottom: 1px solid #dbe3ef; padding: 10px; text-align: left; }
+    th { background: #f8fafc; color: #667085; }
+    .avg { display: inline-block; padding: 6px 10px; border-radius: 999px; background: #ccfbf1; color: #115e59; font-weight: 700; }
+    @media print { button { display: none; } body { margin: 16px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>កាតពិន្ទុសិស្ស</h1>
+      <p class="meta">Student Management System</p>
+    </div>
+    <button onclick="window.print()">Print / Save PDF</button>
+  </header>
+  {% for student in students %}
+    <section class="card">
+      <h2>{{ student.name }}</h2>
+      <p class="meta">{{ student.student_code }} | {{ student.class_room or "មិនទាន់មានថ្នាក់" }}</p>
+      <strong class="avg">មធ្យមភាគ៖ {{ student.average_score if student.average_score is not none else "មិនមាន" }}</strong>
+      <table>
+        <thead><tr><th>មុខវិជ្ជា</th><th>ពិន្ទុសរុប</th><th>និទ្ទេស</th></tr></thead>
+        <tbody>
+          {% for score in student.scores %}
+            <tr><td>{{ score.subject.name }}</td><td>{{ score.score }}</td><td>{{ score.grade }}</td></tr>
+          {% else %}
+            <tr><td colspan="3">មិនទាន់មានពិន្ទុ។</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  {% else %}
+    <p>មិនទាន់មានសិស្សទេ។</p>
+  {% endfor %}
+</body>
+</html>
