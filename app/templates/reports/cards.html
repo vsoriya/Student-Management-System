@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}របាយការណ៍{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Report Center</span>
+    <h1>កាតពិន្ទុសិស្ស</h1>
+    <p>មើលសេចក្តីសង្ខេបពិន្ទុ និងនាំចេញឯកសារ។</p>
+  </div>
+  <div class="actions">
+    <a class="button secondary" href="{{ url_for('reports.export_excel') }}">នាំចេញ Excel</a>
+    <a class="button secondary" href="{{ url_for('reports.export_pdf') }}">នាំចេញ PDF</a>
+  </div>
+</header>
+<section class="report-grid">
+  {% for student in students %}
+  <article class="report-card">
+    <div class="report-head">
+      <span class="avatar tiny">{{ student.name[:1]|upper }}</span>
+      <div><h2>{{ student.name }}</h2><p>{{ student.student_code }} | {{ student.class_room or "មិនទាន់មានថ្នាក់" }}</p></div>
+    </div>
+    <strong>មធ្យមភាគ៖ {{ student.average_score if student.average_score is not none else "មិនមាន" }}</strong>
+    <div class="mini-table"><table><tbody>{% for score in student.scores %}<tr><td>{{ score.subject.name }}</td><td>{{ score.score }}</td></tr>{% else %}<tr><td>មិនទាន់មានពិន្ទុ។</td></tr>{% endfor %}</tbody></table></div>
+  </article>
+  {% else %}<p>មិនទាន់មានសិស្សទេ។</p>{% endfor %}
+</section>
+{% endblock %}

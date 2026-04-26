@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="km">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}ប្រព័ន្ធគ្រប់គ្រងសិស្ស{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Inter", "ui-sans-serif", "system-ui", "Arial", "sans-serif"]
+          },
+          colors: {
+            school: {
+              ink: "#0f172a",
+              teal: "#0f766e",
+              blue: "#2563eb",
+              gold: "#d97706"
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="{% if not current_user.is_authenticated %}auth-body{% endif %}">
+  <aside class="sidebar {% if not current_user.is_authenticated %}public-sidebar{% endif %}">
+    <a class="brand" href="{{ url_for('students.dashboard') }}">
+      <span class="brand-mark">SM</span>
+      <span>
+        <strong>សិស្សប្រូ</strong>
+        <small>ប្រព័ន្ធគ្រប់គ្រងសាលា</small>
+      </span>
+    </a>
+    {% if current_user.is_authenticated %}
+      <div class="user-card">
+        <span class="avatar">{{ current_user.name[:1]|upper }}</span>
+        <span>
+          <strong>{{ current_user.name }}</strong>
+          <small>{{ current_user.role|km_role }}</small>
+        </span>
+      </div>
+      <nav class="navlinks">
+        <a href="{{ url_for('students.dashboard') }}">ផ្ទាំងគ្រប់គ្រង</a>
+        <a href="{{ url_for('students.list_students') }}">សិស្ស</a>
+        {% if current_user.role == "admin" %}<a href="{{ url_for('teachers.list_teachers') }}">គ្រូបង្រៀន</a>{% endif %}
+        {% if current_user.role == "admin" %}<a href="{{ url_for('classes.list_classes') }}">ថ្នាក់រៀន</a>{% endif %}
+        {% if current_user.role == "admin" %}<a href="{{ url_for('subjects.list_subjects') }}">មុខវិជ្ជា</a>{% endif %}
+        {% if current_user.role in ["admin", "teacher"] %}<a href="{{ url_for('attendance.attendance_sheet') }}">វត្តមាន</a>{% endif %}
+        <a href="{{ url_for('reports.report_cards') }}">របាយការណ៍</a>
+        {% if current_user.role == "admin" %}<a href="{{ url_for('admin.schedule') }}">កាលវិភាគ</a>{% endif %}
+        {% if current_user.role == "admin" %}<a href="{{ url_for('admin.audit_log') }}">សកម្មភាព</a>{% endif %}
+      </nav>
+      <a class="logout-link" href="{{ url_for('auth.logout') }}">ចាកចេញ</a>
+    {% else %}
+      <div class="public-sidebar-copy">
+        <strong>ប្រព័ន្ធសាលាទំនើប</strong>
+        <span>គ្រប់គ្រងសិស្ស ថ្នាក់រៀន មុខវិជ្ជា វត្តមាន និងរបាយការណ៍ក្នុងកន្លែងតែមួយ។</span>
+      </div>
+    {% endif %}
+  </aside>
+  <main class="page {% if not current_user.is_authenticated %}auth-page{% endif %}">
+    <div class="mobile-brand">
+      <span class="brand-mark">SM</span>
+      <strong>សិស្សប្រូ</strong>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

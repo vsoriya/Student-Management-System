@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}ចុះឈ្មោះ{% endblock %}
+{% block content %}
+<section class="auth-hero">
+  <div class="hidden lg:block">
+    <p class="mb-4 inline-flex rounded-full border border-white/25 bg-white/15 px-4 py-2 text-sm font-bold text-white backdrop-blur">
+      Create New Account
+    </p>
+    <h1 class="max-w-xl text-5xl font-black leading-tight text-white">
+      បង្កើតគណនីសម្រាប់ក្រុមការងារសាលារបស់អ្នក
+    </h1>
+    <p class="mt-5 max-w-lg text-lg leading-8 text-teal-50">
+      ជ្រើសតួនាទីសម្រាប់អ្នកគ្រប់គ្រង គ្រូបង្រៀន ឬសិស្ស ហើយចាប់ផ្តើមប្រើប្រាស់ប្រព័ន្ធភ្លាមៗ។
+    </p>
+  </div>
+
+  <section class="auth-panel tailwind-auth-panel">
+    <div class="mb-7 text-center">
+      <span class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-600 to-blue-600 text-lg font-black text-white shadow-xl shadow-teal-900/20">SM</span>
+      <h1 class="text-3xl font-black text-slate-950">ចុះឈ្មោះ</h1>
+      <p class="mt-2 text-sm text-slate-500">បង្កើតគណនីថ្មីសម្រាប់ប្រើប្រាស់ប្រព័ន្ធ</p>
+    </div>
+    <form method="post" class="space-y-5">
+      <label class="block text-sm font-extrabold text-slate-700">ឈ្មោះ
+        <input class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" name="name" placeholder="ឈ្មោះពេញ" required>
+      </label>
+      <label class="block text-sm font-extrabold text-slate-700">អ៊ីមែល
+        <input class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" type="email" name="email" placeholder="name@example.com" required>
+      </label>
+      <label class="block text-sm font-extrabold text-slate-700">ពាក្យសម្ងាត់
+        <input class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" type="password" name="password" minlength="6" placeholder="យ៉ាងហោចណាស់ ៦ តួអក្សរ" required>
+      </label>
+      <label class="block text-sm font-extrabold text-slate-700">តួនាទី
+        <select class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" name="role">
+        {% for role in roles %}<option value="{{ role }}">{{ role|km_role }}</option>{% endfor %}
+      </select>
+    </label>
+    <button class="h-12 w-full rounded-2xl bg-gradient-to-r from-teal-600 to-blue-600 font-black text-white shadow-xl shadow-teal-900/20 transition hover:-translate-y-0.5 hover:shadow-2xl" type="submit">បង្កើតគណនី</button>
+  </form>
+  <p class="mt-6 text-center text-sm text-slate-500">មានគណនីរួចហើយ? <a class="font-black text-teal-700" href="{{ url_for('auth.login') }}">ចូលប្រើប្រាស់</a></p>
+</section>
+</section>
+{% endblock %}

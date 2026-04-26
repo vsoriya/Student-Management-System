@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Audit Log{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div><span class="eyebrow">Audit Trail</span><h1>ប្រវត្តិសកម្មភាព</h1><p>តាមដានសកម្មភាពសំខាន់ៗក្នុងប្រព័ន្ធ។</p></div>
+</header>
+<div class="table-card"><table>
+  <thead><tr><th>ពេលវេលា</th><th>អ្នកប្រើ</th><th>សកម្មភាព</th><th>ផ្នែក</th><th>ពណ៌នា</th></tr></thead>
+  <tbody>
+    {% for log in logs %}
+    <tr><td>{{ log.created_at.strftime("%Y-%m-%d %H:%M") }}</td><td>{{ log.user.name if log.user else "System" }}</td><td><span class="code-pill">{{ log.action }}</span></td><td>{{ log.entity }}</td><td>{{ log.message or "" }}</td></tr>
+    {% else %}<tr><td colspan="5">មិនទាន់មានសកម្មភាពទេ។</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

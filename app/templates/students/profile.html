@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}ប្រវត្តិរូបសិស្ស{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Student Profile</span>
+    <h1>{{ student.name }}</h1>
+    <p>{{ student.student_code }} | {{ student.class_room or "មិនទាន់មានថ្នាក់" }}</p>
+  </div>
+  {% if current_user.role in ["admin", "teacher"] %}
+    <div class="actions">
+      <a class="button secondary" href="{{ url_for('students.edit_student', student_id=student.id) }}">កែប្រែ</a>
+      {% if current_user.role == "admin" %}<form method="post" action="{{ url_for('students.delete_student', student_id=student.id) }}"><button class="danger">លុប</button></form>{% endif %}
+    </div>
+  {% endif %}
+</header>
+<section class="profile-summary">
+  <div class="profile-hero-card">
+    {% if student.photo_url %}<img class="profile-photo" src="{{ student.photo_url }}" alt="{{ student.name }}">{% else %}<span class="avatar large">{{ student.name[:1]|upper }}</span>{% endif %}
+    <div><strong>{{ student.name }}</strong><small>{{ student.gender|km_gender }} | អាយុ {{ student.age }} | {{ student.phone or "មិនមានលេខទូរស័ព្ទ" }}</small></div>
+  </div>
+  <div class="profile-metric"><span>មធ្យមភាគ</span><strong>{{ student.average_score if student.average_score is not none else "N/A" }}</strong></div>
+  <div class="profile-metric"><span>ចំនួនពិន្ទុ</span><strong>{{ student.scores|length }}</strong></div>
+</section>
+<section class="info-grid">
+  <article class="insight-panel"><span class="eyebrow">Guardian</span><h2>អាណាព្យាបាល</h2><p>{{ student.guardian_name or "មិនមាន" }}</p><p>{{ student.guardian_phone or "មិនមានលេខទូរស័ព្ទ" }}</p></article>
+  <article class="insight-panel"><span class="eyebrow">Emergency</span><h2>ទំនាក់ទំនងបន្ទាន់</h2><p>{{ student.emergency_phone or "មិនមាន" }}</p><p>{{ student.address or "មិនមានអាសយដ្ឋាន" }}</p></article>
+</section>
+<section class="split">
+  <div class="insight-panel">
+    <h2>ពិន្ទុ</h2>
+    <div class="table-card"><table><thead><tr><th>មុខវិជ្ជា</th><th>សរុប</th><th>និទ្ទេស</th></tr></thead><tbody>{% for score in student.scores %}<tr><td>{{ score.subject.name }}</td><td>{{ score.score }}</td><td><span class="grade-pill {{ score.grade|grade_color }}">{{ score.grade }}</span></td></tr>{% else %}<tr><td colspan="3">មិនទាន់មានពិន្ទុទេ។</td></tr>{% endfor %}</tbody></table></div>
+  </div>
+  {% if current_user.role in ["admin", "teacher"] %}
+  <form method="post" action="{{ url_for('students.save_score', student_id=student.id) }}" class="form powerful-form">
+    <h2>បន្ថែមពិន្ទុ</h2>
+    <label>មុខវិជ្ជា <select name="subject_id">{% for subject in subjects %}<option value="{{ subject.id }}">{{ subject.name }}</option>{% endfor %}</select></label>
+    <label>Quiz <input type="number" step="0.01" name="quiz_score" min="0" max="20" value="0" required></label>
+    <label>Homework <input type="number" step="0.01" name="homework_score" min="0" max="20" value="0" required></label>
+    <label>Midterm <input type="number" step="0.01" name="midterm_score" min="0" max="30" value="0" required></label>
+    <label>Final <input type="number" step="0.01" name="final_score" min="0" max="30" value="0" required></label>
+    <button>រក្សាទុកពិន្ទុ</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

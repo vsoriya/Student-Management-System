@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}មុខវិជ្ជា{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Subjects</span>
+    <h1>មុខវិជ្ជា</h1>
+    <p>បង្កើតមុខវិជ្ជាដើម្បីបញ្ចូលពិន្ទុសិស្សតាមមុខវិជ្ជា។</p>
+  </div>
+</header>
+<section class="split">
+  <form method="post" class="form powerful-form">
+    <h2>បន្ថែមមុខវិជ្ជា</h2>
+    <label>ឈ្មោះមុខវិជ្ជា <input name="name" placeholder="គណិតវិទ្យា" required></label>
+    <label>គ្រូបង្រៀន
+      <select name="teacher_id">
+        <option value="">មិនទាន់ជ្រើស</option>
+        {% for teacher in teachers %}<option value="{{ teacher.id }}">{{ teacher.name }}</option>{% endfor %}
+      </select>
+    </label>
+    <button>បន្ថែមមុខវិជ្ជា</button>
+  </form>
+  <div class="table-card"><table>
+    <thead><tr><th>ឈ្មោះ</th><th>គ្រូ</th><th>ចំនួនពិន្ទុ</th><th></th></tr></thead>
+    <tbody>
+      {% for subject in subjects %}
+      <tr><td><strong>{{ subject.name }}</strong></td><td>{{ subject.teacher.name if subject.teacher else "មិនទាន់មាន" }}</td><td><span class="score-badge">{{ subject.scores|length }}</span></td><td><form method="post" action="{{ url_for('subjects.delete_subject', subject_id=subject.id) }}"><button class="danger small">លុប</button></form></td></tr>
+      {% else %}<tr><td colspan="4">មិនទាន់មានមុខវិជ្ជាទេ។</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</section>
+{% endblock %}

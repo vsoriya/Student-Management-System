@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}ថ្នាក់រៀន{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Classrooms</span>
+    <h1>ថ្នាក់រៀន / កម្រិតថ្នាក់</h1>
+    <p>រៀបចំថ្នាក់ និងកម្រិតថ្នាក់សម្រាប់សិស្ស។</p>
+  </div>
+</header>
+<section class="split">
+  <form method="post" class="form powerful-form">
+    <h2>បន្ថែមថ្នាក់</h2>
+    <label>ឈ្មោះថ្នាក់ <input name="name" placeholder="A" required></label>
+    <label>កម្រិតថ្នាក់ <input name="grade" placeholder="ថ្នាក់ទី ១២" required></label>
+    <label>គ្រូទទួលបន្ទុក
+      <select name="teacher_id">
+        <option value="">មិនទាន់ជ្រើស</option>
+        {% for teacher in teachers %}<option value="{{ teacher.id }}">{{ teacher.name }}</option>{% endfor %}
+      </select>
+    </label>
+    <button>បន្ថែមថ្នាក់</button>
+  </form>
+  <div class="table-card"><table>
+    <thead><tr><th>កម្រិតថ្នាក់</th><th>ឈ្មោះថ្នាក់</th><th>គ្រូ</th><th>ចំនួនសិស្ស</th><th></th></tr></thead>
+    <tbody>
+      {% for room in classes %}
+      <tr><td><span class="code-pill">{{ room.grade }}</span></td><td><strong>{{ room.name }}</strong></td><td>{{ room.teacher.name if room.teacher else "មិនទាន់មាន" }}</td><td><span class="score-badge">{{ room.students|length }}</span></td><td><form method="post" action="{{ url_for('classes.delete_class', class_id=room.id) }}"><button class="danger small">លុប</button></form></td></tr>
+      {% else %}<tr><td colspan="5">មិនទាន់មានថ្នាក់ទេ។</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</section>
+{% endblock %}

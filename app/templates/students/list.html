@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}សិស្ស{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Student Directory</span>
+    <h1>បញ្ជីសិស្ស</h1>
+    <p>ស្វែងរក ចម្រោះ និងមើលប្រវត្តិរូបសិស្សពីទីនេះ។</p>
+  </div>
+  {% if current_user.role in ["admin", "teacher"] %}<a class="button" href="{{ url_for('students.create_student') }}">បន្ថែមសិស្ស</a>{% endif %}
+</header>
+<form class="filters" method="get">
+  <input name="search" placeholder="ស្វែងរកតាមឈ្មោះ ឬលេខកូដ" value="{{ search }}">
+  <select name="class_id">
+    <option value="">ថ្នាក់ទាំងអស់</option>
+    {% for room in classes %}<option value="{{ room.id }}" {% if class_id == room.id %}selected{% endif %}>{{ room }}</option>{% endfor %}
+  </select>
+  <button>ចម្រោះ</button>
+</form>
+{% if students %}
+<div class="table-card">
+<table>
+  <thead><tr><th>លេខកូដ</th><th>ឈ្មោះ</th><th>ភេទ</th><th>អាយុ</th><th>ថ្នាក់</th><th>មធ្យមភាគ</th><th></th></tr></thead>
+  <tbody>
+    {% for student in students.items %}
+    <tr>
+      <td><span class="code-pill">{{ student.student_code }}</span></td>
+      <td><span class="person-cell"><span class="avatar tiny">{{ student.name[:1]|upper }}</span><strong>{{ student.name }}</strong></span></td>
+      <td>{{ student.gender|km_gender }}</td><td>{{ student.age }}</td><td>{{ student.class_room or "មិនទាន់មាន" }}</td>
+      <td><span class="score-badge">{{ student.average_score if student.average_score is not none else "មិនមាន" }}</span></td>
+      <td><a class="row-action" href="{{ url_for('students.profile', student_id=student.id) }}">មើល</a></td>
+    </tr>
+    {% else %}<tr><td colspan="7">រកមិនឃើញសិស្សទេ។</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+<div class="pagination">
+  {% if students.has_prev %}<a href="{{ url_for('students.list_students', page=students.prev_num, search=search, class_id=class_id) }}">មុន</a>{% endif %}
+  <span>ទំព័រ {{ students.page }} នៃ {{ students.pages or 1 }}</span>
+  {% if students.has_next %}<a href="{{ url_for('students.list_students', page=students.next_num, search=search, class_id=class_id) }}">បន្ទាប់</a>{% endif %}
+</div>
+{% else %}
+<div class="empty-state">មិនមានប្រវត្តិរូបសិស្សសម្រាប់បង្ហាញទេ។</div>
+{% endif %}
+{% endblock %}

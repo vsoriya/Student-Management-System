@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}វត្តមាន{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Attendance Sheet</span>
+    <h1>វត្តមាន</h1>
+    <p>ជ្រើសថ្ងៃ និងថ្នាក់ ដើម្បីកត់ត្រាស្ថានភាពសិស្ស។</p>
+  </div>
+</header>
+<form class="filters" method="get">
+  <input type="date" name="date" value="{{ selected_date }}">
+  <select name="class_id">
+    <option value="">ថ្នាក់ទាំងអស់</option>
+    {% for room in classes %}<option value="{{ room.id }}" {% if class_id == room.id %}selected{% endif %}>{{ room }}</option>{% endfor %}
+  </select>
+  <button>បង្ហាញ</button>
+</form>
+<form method="post">
+  <input type="hidden" name="date" value="{{ selected_date }}">
+  <input type="hidden" name="class_id" value="{{ class_id or '' }}">
+  <div class="table-card"><table>
+    <thead><tr><th>លេខកូដ</th><th>ឈ្មោះ</th><th>ថ្នាក់</th><th>ស្ថានភាព</th></tr></thead>
+    <tbody>
+      {% for student in students %}
+      <tr>
+        <td>{{ student.student_code }}</td><td>{{ student.name }}</td><td>{{ student.class_room or "" }}</td>
+        <td>
+          <select name="status_{{ student.id }}">
+            {% for status in ["Present", "Absent", "Late", "Excused"] %}
+              <option value="{{ status }}" {% if records.get(student.id, "Present") == status %}selected{% endif %}>{{ status|km_status }}</option>
+            {% endfor %}
+          </select>
+        </td>
+      </tr>
+      {% else %}<tr><td colspan="4">មិនមានសិស្សសម្រាប់បង្ហាញទេ។</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+  <div class="form-footer"><button class="mt">រក្សាទុកវត្តមាន</button></div>
+</form>
+{% endblock %}

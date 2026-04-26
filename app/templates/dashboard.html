@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}ផ្ទាំងគ្រប់គ្រង{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div>
+    <span class="eyebrow">School Command Center</span>
+    <h1>ផ្ទាំងគ្រប់គ្រង</h1>
+    <p>សូមស្វាគមន៍ {{ current_user.name }}។ នេះជាស្ថានភាពសាលាសម្រាប់ថ្ងៃនេះ។</p>
+  </div>
+  {% if current_user.role in ["admin", "teacher"] %}<a class="button" href="{{ url_for('students.create_student') }}">បន្ថែមសិស្ស</a>{% endif %}
+</header>
+<section class="stats-grid">
+  <div class="stat stat-blue"><span>សិស្ស</span><strong>{{ student_count }}</strong><small>ចំនួនសិស្សសរុប</small></div>
+  <div class="stat stat-green"><span>ថ្នាក់រៀន</span><strong>{{ class_count }}</strong><small>ថ្នាក់កំពុងប្រើ</small></div>
+  <div class="stat stat-amber"><span>មុខវិជ្ជា</span><strong>{{ subject_count }}</strong><small>បញ្ជីមុខវិជ្ជា</small></div>
+  <div class="stat stat-red"><span>វត្តមាន</span><strong>{{ attendance_count }}</strong><small>កំណត់ត្រាបានរក្សាទុក</small></div>
+</section>
+<section class="quick-grid">
+  <a href="{{ url_for('students.list_students') }}"><strong>{% if current_user.role == "student" %}មើលព័ត៌មានសិស្ស{% else %}គ្រប់គ្រងសិស្ស{% endif %}</strong><span>{% if current_user.role == "student" %}មើលបញ្ជី និងរបាយការណ៍សិស្ស។{% else %}ស្វែងរក កែប្រវត្តិរូប និងបញ្ចូលពិន្ទុ។{% endif %}</span></a>
+  {% if current_user.role in ["admin", "teacher"] %}<a href="{{ url_for('attendance.attendance_sheet') }}"><strong>កត់ត្រាវត្តមាន</strong><span>កត់ត្រាស្ថានភាពប្រចាំថ្ងៃតាមថ្នាក់។</span></a>{% endif %}
+  <a href="{{ url_for('reports.report_cards') }}"><strong>មើលរបាយការណ៍</strong><span>បង្កើតកាតពិន្ទុ និងនាំចេញឯកសារ។</span></a>
+</section>
+<section class="dashboard-grid">
+  <article class="insight-panel">
+    <div class="panel-heading">
+      <div>
+        <span class="eyebrow">Recent Activity</span>
+        <h2>សិស្សថ្មីៗ</h2>
+      </div>
+      <a href="{{ url_for('students.list_students') }}">មើលទាំងអស់</a>
+    </div>
+    <div class="activity-list">
+      {% for student in recent_students %}
+      <a class="activity-item" href="{{ url_for('students.profile', student_id=student.id) }}">
+        <span class="avatar soft">{{ student.name[:1]|upper }}</span>
+        <span><strong>{{ student.name }}</strong><small>{{ student.student_code }} | {{ student.class_room or "មិនទាន់មានថ្នាក់" }}</small></span>
+        <em>{{ student.average_score if student.average_score is not none else "N/A" }}</em>
+      </a>
+      {% else %}
+      <div class="empty-state">មិនទាន់មានសិស្សថ្មីៗទេ។</div>
+      {% endfor %}
+    </div>
+  </article>
+  <article class="insight-panel accent-panel">
+    <span class="eyebrow">Workflow</span>
+    <h2>{% if current_user.role == "student" %}ផ្លូវកាត់សម្រាប់សិស្ស{% else %}ការងារសំខាន់ៗ{% endif %}</h2>
+    <div class="task-stack">
+      {% if current_user.role == "admin" %}
+        <a href="{{ url_for('classes.list_classes') }}">រៀបចំថ្នាក់រៀន <span>→</span></a>
+        <a href="{{ url_for('subjects.list_subjects') }}">គ្រប់គ្រងមុខវិជ្ជា <span>→</span></a>
+      {% endif %}
+      {% if current_user.role in ["admin", "teacher"] %}
+        <a href="{{ url_for('attendance.attendance_sheet') }}">កត់ត្រាវត្តមាន <span>→</span></a>
+      {% endif %}
+      <a href="{{ url_for('reports.export_excel') }}">ទាញយក Excel <span>→</span></a>
+    </div>
+  </article>
+</section>
+<section class="dashboard-grid">
+  <article class="insight-panel">
+    <div class="panel-heading"><div><span class="eyebrow">Attendance Chart</span><h2>ស្ថានភាពវត្តមាន</h2></div></div>
+    {% set total_att = present_count + absent_count %}
+    {% set present_width = (present_count / total_att * 100) if total_att else 0 %}
+    {% set absent_width = (absent_count / total_att * 100) if total_att else 0 %}
+    <div class="chart-row"><span>មានវត្តមាន</span><div><i style="width: {{ present_width }}%"></i></div><strong>{{ present_count }}</strong></div>
+    <div class="chart-row red"><span>អវត្តមាន</span><div><i style="width: {{ absent_width }}%"></i></div><strong>{{ absent_count }}</strong></div>
+  </article>
+  <article class="insight-panel">
+    <span class="eyebrow">System Health</span>
+    <h2>ប្រព័ន្ធកំពុងដំណើរការ</h2>
+    <p>MySQL database, migration, reports, scores and attendance are active.</p>
+  </article>
+</section>
+{% endblock %}

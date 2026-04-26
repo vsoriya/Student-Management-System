@@ -1,0 +1,25 @@
+<form method="post" class="form wide powerful-form">
+  <label>លេខកូដសិស្ស <input name="student_code" value="{{ student.student_code if student else '' }}" required></label>
+  <label>ឈ្មោះ <input name="name" value="{{ student.name if student else '' }}" required></label>
+  <label>ភេទ
+    <select name="gender">
+      <option value="Male" {% if student and student.gender == "Male" %}selected{% endif %}>ប្រុស</option>
+      <option value="Female" {% if student and student.gender == "Female" %}selected{% endif %}>ស្រី</option>
+      <option value="Other" {% if student and student.gender == "Other" %}selected{% endif %}>ផ្សេងៗ</option>
+    </select>
+  </label>
+  <label>អាយុ <input type="number" name="age" value="{{ student.age if student else '' }}" required></label>
+  <label>លេខទូរស័ព្ទ <input name="phone" value="{{ student.phone if student else '' }}"></label>
+  <label>អាសយដ្ឋាន <input name="address" value="{{ student.address if student else '' }}"></label>
+  <label>ឈ្មោះអាណាព្យាបាល <input name="guardian_name" value="{{ student.guardian_name if student else '' }}"></label>
+  <label>ទូរស័ព្ទអាណាព្យាបាល <input name="guardian_phone" value="{{ student.guardian_phone if student else '' }}"></label>
+  <label>លេខបន្ទាន់ <input name="emergency_phone" value="{{ student.emergency_phone if student else '' }}"></label>
+  <label>រូបថត URL <input name="photo_url" value="{{ student.photo_url if student else '' }}" placeholder="https://..."></label>
+  <label>ថ្នាក់
+    <select name="class_id">
+      <option value="">មិនទាន់មានថ្នាក់</option>
+      {% for room in classes %}<option value="{{ room.id }}" {% if student and student.class_id == room.id %}selected{% endif %}>{{ room }}</option>{% endfor %}
+    </select>
+  </label>
+  <div class="form-footer"><button type="submit">រក្សាទុក</button></div>
+</form>

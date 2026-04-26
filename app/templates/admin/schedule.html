@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}កាលវិភាគ{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div><span class="eyebrow">Timetable</span><h1>កាលវិភាគសិក្សា</h1><p>រៀបចំម៉ោង មុខវិជ្ជា គ្រូ និងថ្នាក់រៀន។</p></div>
+</header>
+<section class="split">
+  <form method="post" class="form powerful-form">
+    <h2>បន្ថែមកាលវិភាគ</h2>
+    <label>ថ្ងៃ <input name="day" placeholder="Monday" required></label>
+    <label>ចាប់ផ្តើម <input name="start_time" placeholder="08:00" required></label>
+    <label>បញ្ចប់ <input name="end_time" placeholder="09:30" required></label>
+    <label>ថ្នាក់ <select name="class_id">{% for room in classes %}<option value="{{ room.id }}">{{ room }}</option>{% endfor %}</select></label>
+    <label>មុខវិជ្ជា <select name="subject_id">{% for subject in subjects %}<option value="{{ subject.id }}">{{ subject.name }}</option>{% endfor %}</select></label>
+    <label>គ្រូ <select name="teacher_id"><option value="">មិនទាន់ជ្រើស</option>{% for teacher in teachers %}<option value="{{ teacher.id }}">{{ teacher.name }}</option>{% endfor %}</select></label>
+    <div class="form-footer"><button>រក្សាទុក</button></div>
+  </form>
+  <div class="table-card"><table>
+    <thead><tr><th>ថ្ងៃ</th><th>ម៉ោង</th><th>ថ្នាក់</th><th>មុខវិជ្ជា</th><th>គ្រូ</th><th></th></tr></thead>
+    <tbody>
+      {% for item in schedules %}
+      <tr><td><span class="code-pill">{{ item.day }}</span></td><td>{{ item.start_time }} - {{ item.end_time }}</td><td>{{ item.class_room }}</td><td>{{ item.subject.name }}</td><td>{{ item.teacher.name if item.teacher else "មិនទាន់មាន" }}</td><td><form method="post" action="{{ url_for('admin.delete_schedule', schedule_id=item.id) }}"><button class="danger small">លុប</button></form></td></tr>
+      {% else %}<tr><td colspan="6">មិនទាន់មានកាលវិភាគទេ។</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</section>
+{% endblock %}
