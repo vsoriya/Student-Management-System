@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}ឆ្នាំសិក្សា{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div>
+    <span class="eyebrow">ឆ្នាំសិក្សា</span>
+    <h1>ឆ្នាំសិក្សា / Semester</h1>
+    <p>កំណត់ term កំពុងប្រើ ដើម្បីភ្ជាប់ការចុះឈ្មោះ កាលវិភាគ វត្តមាន និងពិន្ទុថ្មីៗ។</p>
+  </div>
+</header>
+<section class="split">
+  <form method="post" class="form powerful-form">
+    <h2>បន្ថែមឆ្នាំសិក្សា / Semester</h2>
+    <label>ឈ្មោះ <input name="name" placeholder="2026 Semester 1" required></label>
+    <label>ឆ្នាំសិក្សា <input name="academic_year" placeholder="2026-2027" required></label>
+    <label>Semester <input name="semester" placeholder="Semester 1" required></label>
+    <label>ចាប់ផ្តើម <input type="date" name="start_date"></label>
+    <label>បញ្ចប់ <input type="date" name="end_date"></label>
+    <label class="check-row"><input type="checkbox" name="is_active" value="1"> កំណត់ជា term កំពុងប្រើ</label>
+    <button>រក្សាទុក</button>
+  </form>
+  <div class="table-card"><table>
+    <thead><tr><th>ឈ្មោះ</th><th>ឆ្នាំសិក្សា</th><th>Semester</th><th>កាលបរិច្ឆេទ</th><th>ស្ថានភាព</th><th></th></tr></thead>
+    <tbody>
+      {% for term in terms %}
+      <tr>
+        <td><strong>{{ term.name }}</strong></td>
+        <td>{{ term.academic_year }}</td>
+        <td>{{ term.semester }}</td>
+        <td>{{ term.start_date or "" }} - {{ term.end_date or "" }}</td>
+        <td>{% if term.is_active %}<span class="score-badge">កំពុងប្រើ</span>{% else %}<span class="code-pill">មិនប្រើ</span>{% endif %}</td>
+        <td>
+          {% if not term.is_active %}
+          <form method="post" action="{{ url_for('admin.activate_term', term_id=term.id) }}"><button class="small">កំណត់ប្រើ</button></form>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}<tr><td colspan="6">មិនទាន់មាន academic term ទេ។</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</section>
+{% endblock %}

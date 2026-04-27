@@ -53,3 +53,48 @@ def current_student_profile():
             Student.phone == current_user.email,
         )
     ).first()
+
+
+def current_teacher_profile():
+    if not current_user.is_authenticated or current_user.role != "teacher":
+        return None
+
+    from .models import Teacher
+
+    return Teacher.query.filter_by(user_id=current_user.id).first()
+
+
+def teacher_class_ids(teacher=None):
+    teacher = teacher or current_teacher_profile()
+    if not teacher:
+        return set()
+
+    from .models import ClassRoom, Schedule
+
+    assigned = {item.id for item in ClassRoom.query.filter_by(teacher_id=teacher.id).all()}
+    scheduled = {item.class_id for item in Schedule.query.filter_by(teacher_id=teacher.id).all()}
+    return assigned | scheduled
+
+
+def teacher_subject_ids(teacher=None):
+    teacher = teacher or current_teacher_profile()
+    if not teacher:
+        return set()
+
+    from .models import Schedule, Subject
+
+    assigned = {item.id for item in Subject.query.filter_by(teacher_id=teacher.id).all()}
+    scheduled = {item.subject_id for item in Schedule.query.filter_by(teacher_id=teacher.id).all()}
+    return assigned | scheduled
+
+
+def teacher_can_access_student(student, teacher=None):
+    if not student or not student.class_id:
+        return False
+    return student.class_id in teacher_class_ids(teacher)
+
+
+def active_term():
+    from .models import AcademicTerm
+
+    return AcademicTerm.query.filter_by(is_active=True).order_by(AcademicTerm.id.desc()).first()

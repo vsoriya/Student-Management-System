@@ -5,7 +5,7 @@ from flask_login import current_user, login_required
 from openpyxl import Workbook
 
 from app.models import Student
-from app.utils import current_student_profile
+from app.utils import current_student_profile, teacher_class_ids
 
 reports_bp = Blueprint("reports", __name__, url_prefix="/reports")
 
@@ -14,6 +14,9 @@ def visible_students():
     if current_user.role == "student":
         student = current_student_profile()
         return [student] if student else []
+    if current_user.role == "teacher":
+        class_ids = teacher_class_ids()
+        return Student.query.filter(Student.class_id.in_(class_ids)).order_by(Student.name).all() if class_ids else []
     return Student.query.order_by(Student.name).all()
 
 

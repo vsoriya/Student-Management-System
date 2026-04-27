@@ -28,6 +28,7 @@ def create_app(config_class=Config):
     from .reports.routes import reports_bp
     from .teachers.routes import teachers_bp
     from .admin.routes import admin_bp
+    from .payments.routes import payments_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(students_bp)
@@ -37,8 +38,9 @@ def create_app(config_class=Config):
     app.register_blueprint(reports_bp)
     app.register_blueprint(teachers_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(payments_bp)
 
-    from .models import Attendance, ClassRoom, Score, Student, Subject, Teacher, User
+    from .models import AcademicTerm, Attendance, ClassRoom, FeePlan, Payment, Score, Student, Subject, Teacher, User
 
     @login_manager.user_loader
     def load_user(user_id):

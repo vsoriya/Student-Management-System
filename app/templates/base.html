@@ -46,12 +46,15 @@
       <nav class="navlinks">
         <a href="{{ url_for('students.dashboard') }}">ផ្ទាំងគ្រប់គ្រង</a>
         <a href="{{ url_for('students.list_students') }}">សិស្ស</a>
-        {% if current_user.role == "admin" %}<a href="{{ url_for('admin.enrollments') }}">Enrollment</a>{% endif %}
+        {% if current_user.role == "admin" %}<a href="{{ url_for('admin.enrollments') }}">ចុះឈ្មោះចូលរៀន</a>{% endif %}
         {% if current_user.role == "admin" %}<a href="{{ url_for('teachers.list_teachers') }}">គ្រូបង្រៀន</a>{% endif %}
         {% if current_user.role == "admin" %}<a href="{{ url_for('classes.list_classes') }}">ថ្នាក់រៀន</a>{% endif %}
         {% if current_user.role == "admin" %}<a href="{{ url_for('subjects.list_subjects') }}">មុខវិជ្ជា</a>{% endif %}
         {% if current_user.role in ["admin", "teacher"] %}<a href="{{ url_for('attendance.attendance_sheet') }}">វត្តមាន</a>{% endif %}
         <a href="{{ url_for('reports.report_cards') }}">របាយការណ៍</a>
+        {% if current_user.role == "admin" %}<a href="{{ url_for('payments.plans') }}">ថ្លៃសិក្សា</a>{% endif %}
+        {% if current_user.role == "student" %}<a href="{{ url_for('payments.my_payments') }}">ការបង់ប្រាក់</a>{% endif %}
+        {% if current_user.role == "admin" %}<a href="{{ url_for('admin.terms') }}">ឆ្នាំសិក្សា</a>{% endif %}
         {% if current_user.role == "admin" %}<a href="{{ url_for('admin.schedule') }}">កាលវិភាគ</a>{% endif %}
         {% if current_user.role == "admin" %}<a href="{{ url_for('admin.audit_log') }}">សកម្មភាព</a>{% endif %}
       </nav>

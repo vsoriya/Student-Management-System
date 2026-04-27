@@ -7,7 +7,7 @@
     <h1>បញ្ជីសិស្ស</h1>
     <p>ស្វែងរក ចម្រោះ និងមើលប្រវត្តិរូបសិស្សពីទីនេះ។</p>
   </div>
-  {% if current_user.role in ["admin", "teacher"] %}<a class="button" href="{{ url_for('students.create_student') }}">បន្ថែមសិស្ស</a>{% endif %}
+  {% if current_user.role == "admin" %}<a class="button" href="{{ url_for('students.create_student') }}">បន្ថែមសិស្ស</a>{% endif %}
 </header>
 <form class="filters" method="get">
   <input name="search" placeholder="ស្វែងរកតាមឈ្មោះ ឬលេខកូដ" value="{{ search }}">

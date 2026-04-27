@@ -7,10 +7,10 @@
     <h1>{{ student.name }}</h1>
     <p>{{ student.student_code }} | {{ student.class_room or "មិនទាន់មានថ្នាក់" }}</p>
   </div>
-  {% if current_user.role in ["admin", "teacher"] %}
+  {% if current_user.role == "admin" %}
     <div class="actions">
       <a class="button secondary" href="{{ url_for('students.edit_student', student_id=student.id) }}">កែប្រែ</a>
-      {% if current_user.role == "admin" %}<form method="post" action="{{ url_for('students.delete_student', student_id=student.id) }}"><button class="danger">លុប</button></form>{% endif %}
+      <form method="post" action="{{ url_for('students.delete_student', student_id=student.id) }}"><button class="danger">លុប</button></form>
     </div>
   {% endif %}
 </header>

@@ -7,7 +7,7 @@
     <h1>ផ្ទាំងគ្រប់គ្រង</h1>
     <p>{% if current_user.role == "student" %}សូមស្វាគមន៍ {{ current_user.name }}។ នេះជាព័ត៌មានសិក្សារបស់អ្នក។{% else %}សូមស្វាគមន៍ {{ current_user.name }}។ នេះជាស្ថានភាពសាលាសម្រាប់ថ្ងៃនេះ។{% endif %}</p>
   </div>
-  {% if current_user.role in ["admin", "teacher"] %}<a class="button" href="{{ url_for('students.create_student') }}">បន្ថែមសិស្ស</a>{% endif %}
+  {% if current_user.role == "admin" %}<a class="button" href="{{ url_for('students.create_student') }}">បន្ថែមសិស្ស</a>{% endif %}
 </header>
 {% if current_user.role == "student" %}
 <section class="dashboard-grid">
@@ -51,7 +51,7 @@
   <article class="insight-panel">
     <div class="panel-heading">
       <div>
-        <span class="eyebrow">Recent Activity</span>
+        <span class="eyebrow">សកម្មភាពថ្មីៗ</span>
         <h2>សិស្សថ្មីៗ</h2>
       </div>
       <a href="{{ url_for('students.list_students') }}">មើលទាំងអស់</a>
@@ -69,11 +69,11 @@
     </div>
   </article>
   <article class="insight-panel accent-panel">
-    <span class="eyebrow">Workflow</span>
+    <span class="eyebrow">ការងារសំខាន់</span>
     <h2>{% if current_user.role == "student" %}ផ្លូវកាត់សម្រាប់សិស្ស{% else %}ការងារសំខាន់ៗ{% endif %}</h2>
     <div class="task-stack">
       {% if current_user.role == "admin" %}
-        <a href="{{ url_for('admin.enrollments') }}">Approve enrollment <span>{{ pending_enrollment_count }}</span></a>
+        <a href="{{ url_for('admin.enrollments') }}">អនុម័តការចុះឈ្មោះ <span>{{ pending_enrollment_count }}</span></a>
         <a href="{{ url_for('classes.list_classes') }}">រៀបចំថ្នាក់រៀន <span>→</span></a>
         <a href="{{ url_for('subjects.list_subjects') }}">គ្រប់គ្រងមុខវិជ្ជា <span>→</span></a>
       {% endif %}
@@ -94,7 +94,7 @@
     <div class="chart-row red"><span>អវត្តមាន</span><div><i style="width: {{ absent_width }}%"></i></div><strong>{{ absent_count }}</strong></div>
   </article>
   <article class="insight-panel">
-    <span class="eyebrow">System Health</span>
+    <span class="eyebrow">ស្ថានភាពប្រព័ន្ធ</span>
     <h2>ប្រព័ន្ធកំពុងដំណើរការ</h2>
     <p>MySQL database, migration, reports, scores and attendance are active.</p>
   </article>

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}ការបង់ប្រាក់{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div>
+    <span class="eyebrow">ការបង់ប្រាក់របស់ខ្ញុំ</span>
+    <h1>ការបង់ប្រាក់របស់ខ្ញុំ</h1>
+    <p>{{ student.name if student else current_user.name }}</p>
+  </div>
+</header>
+<div class="table-card"><table>
+  <thead><tr><th>ថ្នាក់</th><th>Term</th><th>ត្រូវបង់</th><th>បានបង់</th><th>នៅខ្វះ</th><th>ស្ថានភាព</th></tr></thead>
+  <tbody>
+    {% for plan in plans %}
+    {% set paid = paid_by_plan[plan.id] %}
+    {% set balance = plan.amount - paid %}
+    <tr>
+      <td>{{ plan.class_room }}</td>
+      <td>{{ plan.term.name if plan.term else "មិនទាន់មាន" }}</td>
+      <td>${{ "%.2f"|format(plan.amount) }}</td>
+      <td>${{ "%.2f"|format(paid) }}</td>
+      <td>${{ "%.2f"|format(balance if balance > 0 else 0) }}</td>
+      <td>{% if paid >= plan.amount %}<span class="score-badge">បង់រួច</span>{% elif paid > 0 %}<span class="code-pill">បង់ខ្លះ</span>{% else %}<span class="code-pill">មិនទាន់បង់</span>{% endif %}</td>
+    </tr>
+    {% else %}<tr><td colspan="6">មិនទាន់មាន fee plan សម្រាប់អ្នកទេ។</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

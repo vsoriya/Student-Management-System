@@ -18,7 +18,7 @@
   <label>ថ្នាក់
     <select name="class_id">
       <option value="">មិនទាន់មានថ្នាក់</option>
-      {% for room in classes %}<option value="{{ room.id }}" {% if student and student.class_id == room.id %}selected{% endif %}>{{ room }}</option>{% endfor %}
+      {% for room in classes %}<option value="{{ room.id }}" {% if student and student.class_id == room.id %}selected{% endif %}>{{ room }}{% if room.teacher %} - {{ room.teacher.name }}{% endif %}</option>{% endfor %}
     </select>
   </label>
   <div class="form-footer"><button type="submit">រក្សាទុក</button></div>

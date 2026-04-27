@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}ថ្លៃសិក្សា{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div>
+    <span class="eyebrow">ថ្លៃសិក្សា</span>
+    <h1>ថ្លៃសិក្សា</h1>
+    <p>កំណត់ fee plan តាមថ្នាក់ និងឆ្នាំសិក្សា/semester។</p>
+  </div>
+</header>
+<section class="split">
+  <form method="post" class="form powerful-form">
+    <h2>បន្ថែមគម្រោងថ្លៃសិក្សា</h2>
+    <label>ថ្នាក់
+      <select name="class_id" required>
+        {% for room in classes %}<option value="{{ room.id }}">{{ room }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>ឆ្នាំសិក្សា / Semester
+      <select name="term_id">
+        <option value="">មិនទាន់ជ្រើស</option>
+        {% for term in terms %}<option value="{{ term.id }}" {% if active_term and active_term.id == term.id %}selected{% endif %}>{{ term.name }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>ចំនួនទឹកប្រាក់ <input type="number" step="0.01" min="0" name="amount" required></label>
+    <label>ថ្ងៃត្រូវបង់ <input type="date" name="due_date"></label>
+    <label>កំណត់ចំណាំ <input name="note"></label>
+    <button>រក្សាទុក</button>
+  </form>
+  <div class="table-card"><table>
+    <thead><tr><th>ថ្នាក់</th><th>Term</th><th>តម្លៃ</th><th>ថ្ងៃត្រូវបង់</th><th>រំពឹងទទួល</th><th>បានបង់</th><th>នៅខ្វះ</th><th></th></tr></thead>
+    <tbody>
+      {% for plan in plans %}
+      {% set summary = summaries[plan.id] %}
+      <tr>
+        <td>{{ plan.class_room }}</td>
+        <td>{{ plan.term.name if plan.term else "មិនទាន់មាន" }}</td>
+        <td>${{ "%.2f"|format(plan.amount) }}</td>
+        <td>{{ plan.due_date or "" }}</td>
+        <td>${{ "%.2f"|format(summary.expected) }}</td>
+        <td>${{ "%.2f"|format(summary.paid) }}</td>
+        <td><span class="score-badge">${{ "%.2f"|format(summary.balance) }}</span></td>
+        <td><a class="row-action" href="{{ url_for('payments.plan_detail', plan_id=plan.id) }}">បង់ប្រាក់</a></td>
+      </tr>
+      {% else %}<tr><td colspan="8">មិនទាន់មាន fee plan ទេ។</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</section>
+{% endblock %}

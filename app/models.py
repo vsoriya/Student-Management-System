@@ -92,22 +92,38 @@ class Teacher(db.Model):
     schedules = db.relationship("Schedule", back_populates="teacher", cascade="all, delete-orphan")
 
 
+class AcademicTerm(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    academic_year = db.Column(db.String(20), nullable=False)
+    semester = db.Column(db.String(40), nullable=False)
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
+    is_active = db.Column(db.Boolean, nullable=False, default=False)
+
+    def __repr__(self):
+        return f"{self.academic_year} - {self.semester}"
+
+
 class Enrollment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False, unique=True)
     class_id = db.Column(db.Integer, db.ForeignKey("class_rooms.id"))
+    term_id = db.Column(db.Integer, db.ForeignKey("academic_term.id"))
     status = db.Column(db.String(20), nullable=False, default="Pending")
     enrolled_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     approved_at = db.Column(db.DateTime)
 
     student = db.relationship("Student", back_populates="enrollment")
     class_room = db.relationship("ClassRoom")
+    term = db.relationship("AcademicTerm")
 
 
 class Score(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey("subject.id"), nullable=False)
+    term_id = db.Column(db.Integer, db.ForeignKey("academic_term.id"))
     quiz_score = db.Column(db.Float, nullable=False, default=0)
     homework_score = db.Column(db.Float, nullable=False, default=0)
     midterm_score = db.Column(db.Float, nullable=False, default=0)
@@ -116,6 +132,7 @@ class Score(db.Model):
 
     student = db.relationship("Student", back_populates="scores")
     subject = db.relationship("Subject", back_populates="scores")
+    term = db.relationship("AcademicTerm")
     __table_args__ = (db.UniqueConstraint("student_id", "subject_id", name="uq_student_subject"),)
 
     def calculate_total(self):
@@ -138,10 +155,12 @@ class Score(db.Model):
 class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
+    term_id = db.Column(db.Integer, db.ForeignKey("academic_term.id"))
     date = db.Column(db.Date, nullable=False, default=date.today)
     status = db.Column(db.String(20), nullable=False, default="Present")
 
     student = db.relationship("Student", back_populates="attendances")
+    term = db.relationship("AcademicTerm")
     __table_args__ = (db.UniqueConstraint("student_id", "date", name="uq_student_attendance_date"),)
 
 
@@ -153,10 +172,38 @@ class Schedule(db.Model):
     class_id = db.Column(db.Integer, db.ForeignKey("class_rooms.id"), nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey("subject.id"), nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey("teacher.id"))
+    term_id = db.Column(db.Integer, db.ForeignKey("academic_term.id"))
 
     class_room = db.relationship("ClassRoom", back_populates="schedules")
     subject = db.relationship("Subject", back_populates="schedules")
     teacher = db.relationship("Teacher", back_populates="schedules")
+    term = db.relationship("AcademicTerm")
+
+
+class FeePlan(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    class_id = db.Column(db.Integer, db.ForeignKey("class_rooms.id"), nullable=False)
+    term_id = db.Column(db.Integer, db.ForeignKey("academic_term.id"))
+    amount = db.Column(db.Float, nullable=False, default=0)
+    due_date = db.Column(db.Date)
+    note = db.Column(db.String(255))
+
+    class_room = db.relationship("ClassRoom")
+    term = db.relationship("AcademicTerm")
+    payments = db.relationship("Payment", back_populates="fee_plan", cascade="all, delete-orphan")
+
+
+class Payment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
+    fee_plan_id = db.Column(db.Integer, db.ForeignKey("fee_plan.id"), nullable=False)
+    amount = db.Column(db.Float, nullable=False, default=0)
+    paid_at = db.Column(db.Date, nullable=False, default=date.today)
+    note = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    student = db.relationship("Student")
+    fee_plan = db.relationship("FeePlan", back_populates="payments")
 
 
 class AuditLog(db.Model):

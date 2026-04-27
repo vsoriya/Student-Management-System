@@ -22,11 +22,28 @@
     <button>បន្ថែមថ្នាក់</button>
   </form>
   <div class="table-card"><table>
-    <thead><tr><th>កម្រិតថ្នាក់</th><th>ឈ្មោះថ្នាក់</th><th>គ្រូ</th><th>ចំនួនសិស្ស</th><th></th></tr></thead>
+    <thead><tr><th>កម្រិតថ្នាក់</th><th>ឈ្មោះថ្នាក់</th><th>គ្រូ</th><th>ចំនួនសិស្ស</th><th>កែប្រែ</th><th></th></tr></thead>
     <tbody>
       {% for room in classes %}
-      <tr><td><span class="code-pill">{{ room.grade }}</span></td><td><strong>{{ room.name }}</strong></td><td>{{ room.teacher.name if room.teacher else "មិនទាន់មាន" }}</td><td><span class="score-badge">{{ room.students|length }}</span></td><td><form method="post" action="{{ url_for('classes.delete_class', class_id=room.id) }}"><button class="danger small">លុប</button></form></td></tr>
-      {% else %}<tr><td colspan="5">មិនទាន់មានថ្នាក់ទេ។</td></tr>{% endfor %}
+      <tr>
+        <td><span class="code-pill">{{ room.grade }}</span></td>
+        <td><strong>{{ room.name }}</strong></td>
+        <td>{{ room.teacher.name if room.teacher else "មិនទាន់មាន" }}</td>
+        <td><span class="score-badge">{{ room.students|length }}</span></td>
+        <td>
+          <form method="post" action="{{ url_for('classes.update_class', class_id=room.id) }}" class="inline-form">
+            <input name="grade" value="{{ room.grade }}" required>
+            <input name="name" value="{{ room.name }}" required>
+            <select name="teacher_id">
+              <option value="">មិនទាន់ជ្រើស</option>
+              {% for teacher in teachers %}<option value="{{ teacher.id }}" {% if room.teacher_id == teacher.id %}selected{% endif %}>{{ teacher.name }}</option>{% endfor %}
+            </select>
+            <button class="small">រក្សាទុក</button>
+          </form>
+        </td>
+        <td><form method="post" action="{{ url_for('classes.delete_class', class_id=room.id) }}"><button class="danger small">លុប</button></form></td>
+      </tr>
+      {% else %}<tr><td colspan="6">មិនទាន់មានថ្នាក់ទេ។</td></tr>{% endfor %}
     </tbody>
   </table></div>
 </section>

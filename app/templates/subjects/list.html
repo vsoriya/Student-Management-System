@@ -21,11 +21,26 @@
     <button>បន្ថែមមុខវិជ្ជា</button>
   </form>
   <div class="table-card"><table>
-    <thead><tr><th>ឈ្មោះ</th><th>គ្រូ</th><th>ចំនួនពិន្ទុ</th><th></th></tr></thead>
+    <thead><tr><th>ឈ្មោះ</th><th>គ្រូ</th><th>ចំនួនពិន្ទុ</th><th>កែប្រែ</th><th></th></tr></thead>
     <tbody>
       {% for subject in subjects %}
-      <tr><td><strong>{{ subject.name }}</strong></td><td>{{ subject.teacher.name if subject.teacher else "មិនទាន់មាន" }}</td><td><span class="score-badge">{{ subject.scores|length }}</span></td><td><form method="post" action="{{ url_for('subjects.delete_subject', subject_id=subject.id) }}"><button class="danger small">លុប</button></form></td></tr>
-      {% else %}<tr><td colspan="4">មិនទាន់មានមុខវិជ្ជាទេ។</td></tr>{% endfor %}
+      <tr>
+        <td><strong>{{ subject.name }}</strong></td>
+        <td>{{ subject.teacher.name if subject.teacher else "មិនទាន់មាន" }}</td>
+        <td><span class="score-badge">{{ subject.scores|length }}</span></td>
+        <td>
+          <form method="post" action="{{ url_for('subjects.update_subject', subject_id=subject.id) }}" class="inline-form">
+            <input name="name" value="{{ subject.name }}" required>
+            <select name="teacher_id">
+              <option value="">មិនទាន់ជ្រើស</option>
+              {% for teacher in teachers %}<option value="{{ teacher.id }}" {% if subject.teacher_id == teacher.id %}selected{% endif %}>{{ teacher.name }}</option>{% endfor %}
+            </select>
+            <button class="small">រក្សាទុក</button>
+          </form>
+        </td>
+        <td><form method="post" action="{{ url_for('subjects.delete_subject', subject_id=subject.id) }}"><button class="danger small">លុប</button></form></td>
+      </tr>
+      {% else %}<tr><td colspan="5">មិនទាន់មានមុខវិជ្ជាទេ។</td></tr>{% endfor %}
     </tbody>
   </table></div>
 </section>

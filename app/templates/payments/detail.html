@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}ការបង់ប្រាក់{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div>
+    <span class="eyebrow">ការប្រមូលប្រាក់</span>
+    <h1>{{ plan.class_room }} - ${{ "%.2f"|format(plan.amount) }}</h1>
+    <p>{{ plan.term.name if plan.term else "មិនទាន់មាន term" }} | ថ្ងៃត្រូវបង់៖ {{ plan.due_date or "មិនទាន់កំណត់" }}</p>
+  </div>
+  <a class="button secondary" href="{{ url_for('payments.plans') }}">ត្រឡប់ក្រោយ</a>
+</header>
+<section class="split">
+  <form method="post" class="form powerful-form">
+    <h2>កត់ត្រាការបង់ប្រាក់</h2>
+    <label>សិស្ស
+      <select name="student_id" required>
+        {% for student in students %}<option value="{{ student.id }}">{{ student.student_code }} - {{ student.name }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>ចំនួនបង់ <input type="number" step="0.01" min="0.01" name="amount" required></label>
+    <label>ថ្ងៃបង់ <input type="date" name="paid_at" value="{{ today }}"></label>
+    <label>កំណត់ចំណាំ <input name="note"></label>
+    <button>រក្សាទុកការបង់ប្រាក់</button>
+  </form>
+  <div class="table-card"><table>
+    <thead><tr><th>សិស្ស</th><th>ត្រូវបង់</th><th>បានបង់</th><th>នៅខ្វះ</th><th>ស្ថានភាព</th></tr></thead>
+    <tbody>
+      {% for student in students %}
+      {% set paid = paid_by_student[student.id] %}
+      {% set balance = plan.amount - paid %}
+      <tr>
+        <td><strong>{{ student.name }}</strong><br><small>{{ student.student_code }}</small></td>
+        <td>${{ "%.2f"|format(plan.amount) }}</td>
+        <td>${{ "%.2f"|format(paid) }}</td>
+        <td>${{ "%.2f"|format(balance if balance > 0 else 0) }}</td>
+        <td>{% if paid >= plan.amount %}<span class="score-badge">បង់រួច</span>{% elif paid > 0 %}<span class="code-pill">បង់ខ្លះ</span>{% else %}<span class="code-pill">មិនទាន់បង់</span>{% endif %}</td>
+      </tr>
+      {% else %}<tr><td colspan="5">មិនមានសិស្សក្នុងថ្នាក់នេះទេ។</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</section>
+{% endblock %}

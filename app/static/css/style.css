@@ -302,12 +302,33 @@ button.small { min-height: 34px; padding: 7px 11px; border-radius: 10px; font-si
   vertical-align: middle;
 }
 
+.inline-form input,
 .inline-form select {
   min-width: 150px;
   min-height: 34px;
   padding: 6px 10px;
   border-radius: 10px;
   font-size: 12px;
+}
+
+.inline-form input {
+  max-width: 170px;
+}
+
+.inline-form button {
+  flex: 0 0 auto;
+}
+
+.check-row {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 10px;
+}
+
+.check-row input {
+  width: auto;
+  min-height: 0;
 }
 
 .stats-grid, .report-grid, .quick-grid {
