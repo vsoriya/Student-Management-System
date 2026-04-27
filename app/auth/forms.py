@@ -1,6 +1,3 @@
-ROLES = ("admin", "teacher", "student")
-
-
 def validate_register_form(form):
     errors = []
     if not form.get("name", "").strip():
@@ -9,6 +6,4 @@ def validate_register_form(form):
         errors.append("សូមបញ្ចូលអ៊ីមែល។")
     if len(form.get("password", "")) < 6:
         errors.append("ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ ៦ តួអក្សរ។")
-    if form.get("role", "student") not in ROLES:
-        errors.append("តួនាទីមិនត្រឹមត្រូវ។")
     return errors

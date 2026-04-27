@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
 from app.models import User
-from .forms import ROLES, validate_register_form
+from .forms import validate_register_form
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -40,14 +40,14 @@ def register():
             user = User(
                 name=request.form["name"].strip(),
                 email=email,
-                role=request.form.get("role", "student"),
+                role="student",
             )
             user.set_password(request.form["password"])
             db.session.add(user)
             db.session.commit()
             flash("បានបង្កើតគណនីរួចរាល់។ សូមចូលប្រើប្រាស់។", "success")
             return redirect(url_for("auth.login"))
-    return render_template("register.html", roles=ROLES)
+    return render_template("register.html")
 
 
 @auth_bp.route("/logout")
