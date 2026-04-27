@@ -1,18 +1,26 @@
 from io import BytesIO
 
 from flask import Blueprint, Response, render_template
-from flask_login import login_required
+from flask_login import current_user, login_required
 from openpyxl import Workbook
 
 from app.models import Student
+from app.utils import current_student_profile
 
 reports_bp = Blueprint("reports", __name__, url_prefix="/reports")
+
+
+def visible_students():
+    if current_user.role == "student":
+        student = current_student_profile()
+        return [student] if student else []
+    return Student.query.order_by(Student.name).all()
 
 
 @reports_bp.route("/")
 @login_required
 def report_cards():
-    return render_template("reports/cards.html", students=Student.query.order_by(Student.name).all())
+    return render_template("reports/cards.html", students=visible_students())
 
 
 @reports_bp.route("/students.xlsx")
@@ -22,7 +30,7 @@ def export_excel():
     ws = wb.active
     ws.title = "សិស្ស"
     ws.append(["លេខកូដ", "ឈ្មោះ", "ភេទ", "អាយុ", "ទូរស័ព្ទ", "ថ្នាក់", "មធ្យមភាគ"])
-    for student in Student.query.order_by(Student.name):
+    for student in visible_students():
         ws.append([
             student.student_code,
             student.name,
@@ -41,5 +49,4 @@ def export_excel():
 @reports_bp.route("/students.pdf")
 @login_required
 def export_pdf():
-    students = Student.query.order_by(Student.name).all()
-    return render_template("reports/print.html", students=students)
+    return render_template("reports/print.html", students=visible_students())

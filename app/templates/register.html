@@ -10,7 +10,7 @@
       បង្កើតគណនីសិស្សសម្រាប់ចូលមើលព័ត៌មានសិក្សា
     </h1>
     <p class="mt-5 max-w-lg text-lg leading-8 text-teal-50">
-      គណនីដែលចុះឈ្មោះពីទីនេះនឹងមានសិទ្ធិជា សិស្ស ប៉ុណ្ណោះ។ សិទ្ធិគ្រប់គ្រងត្រូវបង្កើតដោយម្ចាស់ប្រព័ន្ធ។
+      គណនីដែលចុះឈ្មោះពីទីនេះនឹងបង្កើតប្រវត្តិរូបសិស្សដោយស្វ័យប្រវត្តិ ហើយ admin អាចមើលឃើញក្នុងបញ្ជីសិស្ស។
     </p>
   </div>
 
@@ -22,16 +22,50 @@
     </div>
     <form method="post" class="space-y-5">
       <label class="block text-sm font-extrabold text-slate-700">ឈ្មោះ
-        <input class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" name="name" placeholder="ឈ្មោះពេញ" required>
+        <input class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" name="name" value="{{ request.form.get('name', '') }}" placeholder="ឈ្មោះពេញ" required>
       </label>
       <label class="block text-sm font-extrabold text-slate-700">អ៊ីមែល
-        <input class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" type="email" name="email" placeholder="name@example.com" required>
+        <input class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" type="email" name="email" value="{{ request.form.get('email', '') }}" placeholder="name@example.com" required>
       </label>
       <label class="block text-sm font-extrabold text-slate-700">ពាក្យសម្ងាត់
         <input class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" type="password" name="password" minlength="6" placeholder="យ៉ាងហោចណាស់ ៦ តួអក្សរ" required>
       </label>
+      <div class="grid gap-5 md:grid-cols-2">
+        <label class="block text-sm font-extrabold text-slate-700">លេខកូដសិស្ស
+          <input class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" name="student_code" value="{{ request.form.get('student_code', '') }}" placeholder="ឧ. ST001" required>
+        </label>
+        <label class="block text-sm font-extrabold text-slate-700">អាយុ
+          <input class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" type="number" name="age" value="{{ request.form.get('age', '') }}" min="1" required>
+        </label>
+      </div>
+      <div class="grid gap-5 md:grid-cols-2">
+        <label class="block text-sm font-extrabold text-slate-700">ភេទ
+          <select class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" name="gender" required>
+            <option value="Male" {% if request.form.get('gender', 'Male') == 'Male' %}selected{% endif %}>ប្រុស</option>
+            <option value="Female" {% if request.form.get('gender') == 'Female' %}selected{% endif %}>ស្រី</option>
+            <option value="Other" {% if request.form.get('gender') == 'Other' %}selected{% endif %}>ផ្សេងៗ</option>
+          </select>
+        </label>
+        <label class="block text-sm font-extrabold text-slate-700">លេខទូរស័ព្ទ
+          <input class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" name="phone" value="{{ request.form.get('phone', '') }}">
+        </label>
+      </div>
+      <label class="block text-sm font-extrabold text-slate-700">អាសយដ្ឋាន
+        <input class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" name="address" value="{{ request.form.get('address', '') }}">
+      </label>
+      <div class="grid gap-5 md:grid-cols-2">
+        <label class="block text-sm font-extrabold text-slate-700">ឈ្មោះអាណាព្យាបាល
+          <input class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" name="guardian_name" value="{{ request.form.get('guardian_name', '') }}">
+        </label>
+        <label class="block text-sm font-extrabold text-slate-700">ទូរស័ព្ទអាណាព្យាបាល
+          <input class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" name="guardian_phone" value="{{ request.form.get('guardian_phone', '') }}">
+        </label>
+      </div>
+      <label class="block text-sm font-extrabold text-slate-700">លេខបន្ទាន់
+        <input class="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 shadow-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100" name="emergency_phone" value="{{ request.form.get('emergency_phone', '') }}">
+      </label>
       <div class="rounded-2xl border border-teal-100 bg-teal-50 px-4 py-3 text-sm font-bold text-teal-800">
-        គណនីថ្មីនឹងត្រូវបានកំណត់ជា សិស្ស ដោយស្វ័យប្រវត្តិ។
+        គណនីថ្មីនឹងត្រូវបានកំណត់ជា សិស្ស។ Admin នឹង approve និង assign class មុនពេលកាលវិភាគបង្ហាញ។
       </div>
     <button class="h-12 w-full rounded-2xl bg-gradient-to-r from-teal-600 to-blue-600 font-black text-white shadow-xl shadow-teal-900/20 transition hover:-translate-y-0.5 hover:shadow-2xl" type="submit">បង្កើតគណនី</button>
   </form>

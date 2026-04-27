@@ -1,10 +1,10 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import abort, Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import or_
 
 from app.extensions import db
-from app.models import Attendance, ClassRoom, Score, Student, Subject
-from app.utils import roles_required, write_audit
+from app.models import Attendance, ClassRoom, Enrollment, Score, Schedule, Student, Subject
+from app.utils import current_student_profile, roles_required, write_audit
 from .forms import student_payload, validate_student
 
 students_bp = Blueprint("students", __name__, url_prefix="/students")
@@ -13,15 +13,40 @@ students_bp = Blueprint("students", __name__, url_prefix="/students")
 @students_bp.route("/dashboard")
 @login_required
 def dashboard():
+    own_student = None
+    student_schedules = []
+    if current_user.role == "student":
+        own_student = current_student_profile()
+        if own_student and own_student.class_id:
+            student_schedules = Schedule.query.filter_by(class_id=own_student.class_id).order_by(Schedule.day, Schedule.start_time).all()
+    student_count = Student.query.count()
+    recent_students = Student.query.order_by(Student.id.desc()).limit(5).all()
+    if current_user.role == "student":
+        student_count = 1 if own_student else 0
+        recent_students = [own_student] if own_student else []
+        class_count = 1 if own_student and own_student.class_id else 0
+        subject_count = len({item.subject_id for item in student_schedules})
+        attendance_count = Attendance.query.filter_by(student_id=own_student.id).count() if own_student else 0
+        present_count = Attendance.query.filter_by(student_id=own_student.id, status="Present").count() if own_student else 0
+        absent_count = Attendance.query.filter_by(student_id=own_student.id, status="Absent").count() if own_student else 0
+    else:
+        class_count = ClassRoom.query.count()
+        subject_count = Subject.query.count()
+        attendance_count = Attendance.query.count()
+        present_count = Attendance.query.filter_by(status="Present").count()
+        absent_count = Attendance.query.filter_by(status="Absent").count()
     return render_template(
         "dashboard.html",
-        student_count=Student.query.count(),
-        class_count=ClassRoom.query.count(),
-        subject_count=Subject.query.count(),
-        attendance_count=Attendance.query.count(),
-        recent_students=Student.query.order_by(Student.id.desc()).limit(5).all(),
-        present_count=Attendance.query.filter_by(status="Present").count(),
-        absent_count=Attendance.query.filter_by(status="Absent").count(),
+        student_count=student_count,
+        class_count=class_count,
+        subject_count=subject_count,
+        attendance_count=attendance_count,
+        recent_students=recent_students,
+        present_count=present_count,
+        absent_count=absent_count,
+        pending_enrollment_count=Enrollment.query.filter_by(status="Pending").count(),
+        own_student=own_student,
+        student_schedules=student_schedules,
     )
 
 
@@ -29,13 +54,7 @@ def dashboard():
 @login_required
 def list_students():
     if current_user.role == "student":
-        own_student = Student.query.filter(
-            or_(
-                Student.student_code == current_user.email.split("@")[0],
-                Student.name == current_user.name,
-                Student.phone == current_user.email,
-            )
-        ).first()
+        own_student = current_student_profile()
         if own_student:
             return redirect(url_for("students.profile", student_id=own_student.id))
         flash("គណនីសិស្សនេះមិនទាន់ភ្ជាប់ជាមួយប្រវត្តិរូបសិស្សទេ។ សូមទាក់ទងអ្នកគ្រប់គ្រង។", "warning")
@@ -79,6 +98,10 @@ def create_student():
 @login_required
 def profile(student_id):
     student = Student.query.get_or_404(student_id)
+    if current_user.role == "student":
+        own_student = current_student_profile()
+        if not own_student or own_student.id != student.id:
+            abort(403)
     subjects = Subject.query.order_by(Subject.name).all()
     return render_template("students/profile.html", student=student, subjects=subjects)
 

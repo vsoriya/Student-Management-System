@@ -5,15 +5,42 @@
   <div>
     <span class="eyebrow">School Command Center</span>
     <h1>ផ្ទាំងគ្រប់គ្រង</h1>
-    <p>សូមស្វាគមន៍ {{ current_user.name }}។ នេះជាស្ថានភាពសាលាសម្រាប់ថ្ងៃនេះ។</p>
+    <p>{% if current_user.role == "student" %}សូមស្វាគមន៍ {{ current_user.name }}។ នេះជាព័ត៌មានសិក្សារបស់អ្នក។{% else %}សូមស្វាគមន៍ {{ current_user.name }}។ នេះជាស្ថានភាពសាលាសម្រាប់ថ្ងៃនេះ។{% endif %}</p>
   </div>
   {% if current_user.role in ["admin", "teacher"] %}<a class="button" href="{{ url_for('students.create_student') }}">បន្ថែមសិស្ស</a>{% endif %}
 </header>
+{% if current_user.role == "student" %}
+<section class="dashboard-grid">
+  <article class="insight-panel">
+    <span class="eyebrow">Enrollment</span>
+    <h2>ស្ថានភាពចុះឈ្មោះចូលរៀន</h2>
+    {% if own_student and own_student.enrollment %}
+      <p>ស្ថានភាព៖ <strong>{{ own_student.enrollment.status }}</strong></p>
+      <p>ថ្នាក់៖ {{ own_student.class_room or "កំពុងរង់ចាំ admin assign" }}</p>
+    {% else %}
+      <p>គណនីនេះមិនទាន់ភ្ជាប់ជាមួយ enrollment ទេ។ សូមទាក់ទង admin។</p>
+    {% endif %}
+  </article>
+  <article class="insight-panel">
+    <span class="eyebrow">Timetable</span>
+    <h2>មុខវិជ្ជា និងម៉ោងរៀន</h2>
+    {% if student_schedules %}
+      <div class="mini-table"><table><tbody>
+        {% for item in student_schedules %}
+        <tr><td><span class="code-pill">{{ item.day }}</span></td><td>{{ item.start_time }} - {{ item.end_time }}</td><td>{{ item.subject.name }}</td><td>{{ item.teacher.name if item.teacher else "មិនទាន់មានគ្រូ" }}</td></tr>
+        {% endfor %}
+      </tbody></table></div>
+    {% else %}
+      <p>មិនទាន់មានកាលវិភាគទេ។ ប្រសិនបើអ្នកទើបចុះឈ្មោះ សូមរង់ចាំ admin approve និង assign class។</p>
+    {% endif %}
+  </article>
+</section>
+{% endif %}
 <section class="stats-grid">
-  <div class="stat stat-blue"><span>សិស្ស</span><strong>{{ student_count }}</strong><small>ចំនួនសិស្សសរុប</small></div>
-  <div class="stat stat-green"><span>ថ្នាក់រៀន</span><strong>{{ class_count }}</strong><small>ថ្នាក់កំពុងប្រើ</small></div>
-  <div class="stat stat-amber"><span>មុខវិជ្ជា</span><strong>{{ subject_count }}</strong><small>បញ្ជីមុខវិជ្ជា</small></div>
-  <div class="stat stat-red"><span>វត្តមាន</span><strong>{{ attendance_count }}</strong><small>កំណត់ត្រាបានរក្សាទុក</small></div>
+  <div class="stat stat-blue"><span>សិស្ស</span><strong>{{ student_count }}</strong><small>{% if current_user.role == "student" %}ប្រវត្តិរូបរបស់អ្នក{% else %}ចំនួនសិស្សសរុប{% endif %}</small></div>
+  <div class="stat stat-green"><span>ថ្នាក់រៀន</span><strong>{{ class_count }}</strong><small>{% if current_user.role == "student" %}ថ្នាក់របស់អ្នក{% else %}ថ្នាក់កំពុងប្រើ{% endif %}</small></div>
+  <div class="stat stat-amber"><span>មុខវិជ្ជា</span><strong>{{ subject_count }}</strong><small>{% if current_user.role == "student" %}មុខវិជ្ជាក្នុងកាលវិភាគ{% else %}បញ្ជីមុខវិជ្ជា{% endif %}</small></div>
+  <div class="stat stat-red"><span>វត្តមាន</span><strong>{{ attendance_count }}</strong><small>{% if current_user.role == "student" %}កំណត់ត្រារបស់អ្នក{% else %}កំណត់ត្រាបានរក្សាទុក{% endif %}</small></div>
 </section>
 <section class="quick-grid">
   <a href="{{ url_for('students.list_students') }}"><strong>{% if current_user.role == "student" %}មើលព័ត៌មានសិស្ស{% else %}គ្រប់គ្រងសិស្ស{% endif %}</strong><span>{% if current_user.role == "student" %}មើលបញ្ជី និងរបាយការណ៍សិស្ស។{% else %}ស្វែងរក កែប្រវត្តិរូប និងបញ្ចូលពិន្ទុ។{% endif %}</span></a>
@@ -46,6 +73,7 @@
     <h2>{% if current_user.role == "student" %}ផ្លូវកាត់សម្រាប់សិស្ស{% else %}ការងារសំខាន់ៗ{% endif %}</h2>
     <div class="task-stack">
       {% if current_user.role == "admin" %}
+        <a href="{{ url_for('admin.enrollments') }}">Approve enrollment <span>{{ pending_enrollment_count }}</span></a>
         <a href="{{ url_for('classes.list_classes') }}">រៀបចំថ្នាក់រៀន <span>→</span></a>
         <a href="{{ url_for('subjects.list_subjects') }}">គ្រប់គ្រងមុខវិជ្ជា <span>→</span></a>
       {% endif %}

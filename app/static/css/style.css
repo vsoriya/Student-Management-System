@@ -294,6 +294,22 @@ button:hover, .button:hover { transform: translateY(-1px); box-shadow: 0 16px 28
 button.danger, .danger { background: linear-gradient(135deg, var(--red), #991b1b); color: white; box-shadow: 0 12px 22px rgba(220, 38, 38, 0.15); }
 button.small { min-height: 34px; padding: 7px 11px; border-radius: 10px; font-size: 12px; }
 
+.inline-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 4px 2px 0;
+  vertical-align: middle;
+}
+
+.inline-form select {
+  min-width: 150px;
+  min-height: 34px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
 .stats-grid, .report-grid, .quick-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

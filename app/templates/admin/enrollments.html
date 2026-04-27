@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Enrollment{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Enrollment Requests</span>
+    <h1>ការចុះឈ្មោះចូលរៀន</h1>
+    <p>Approve សិស្សថ្មី និង assign ថ្នាក់ ដើម្បីឱ្យសិស្សឃើញមុខវិជ្ជា ម៉ោងរៀន និងគ្រូបង្រៀន។</p>
+  </div>
+</header>
+<div class="table-card">
+  <table>
+    <thead>
+      <tr><th>សិស្ស</th><th>លេខកូដ</th><th>ស្ថានភាព</th><th>ថ្នាក់</th><th>ថ្ងៃចុះឈ្មោះ</th><th>សកម្មភាព</th></tr>
+    </thead>
+    <tbody>
+      {% for enrollment in enrollments %}
+      <tr>
+        <td><span class="person-cell"><span class="avatar tiny">{{ enrollment.student.name[:1]|upper }}</span><strong>{{ enrollment.student.name }}</strong></span></td>
+        <td><span class="code-pill">{{ enrollment.student.student_code }}</span></td>
+        <td><span class="score-badge">{{ enrollment.status }}</span></td>
+        <td>{{ enrollment.class_room or enrollment.student.class_room or "មិនទាន់មាន" }}</td>
+        <td>{{ enrollment.enrolled_at.strftime("%Y-%m-%d") }}</td>
+        <td>
+          {% if enrollment.status == "Pending" %}
+          <form method="post" action="{{ url_for('admin.approve_enrollment', enrollment_id=enrollment.id) }}" class="inline-form">
+            <select name="class_id" required>
+              <option value="">ជ្រើសថ្នាក់</option>
+              {% for room in classes %}<option value="{{ room.id }}">{{ room }}</option>{% endfor %}
+            </select>
+            <button class="small" type="submit">Approve</button>
+          </form>
+          <form method="post" action="{{ url_for('admin.reject_enrollment', enrollment_id=enrollment.id) }}" class="inline-form">
+            <button class="danger small" type="submit">Reject</button>
+          </form>
+          {% else %}
+          <span class="code-pill">បានដំណើរការ</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6">មិនទាន់មាន enrollment request ទេ។</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -2,10 +2,56 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required
 
 from app.extensions import db
-from app.models import AuditLog, ClassRoom, Schedule, Subject, Teacher
+from app.models import AuditLog, ClassRoom, Enrollment, Schedule, Subject, Teacher
 from app.utils import roles_required, write_audit
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
+
+
+@admin_bp.route("/enrollments")
+@login_required
+@roles_required("admin")
+def enrollments():
+    return render_template(
+        "admin/enrollments.html",
+        enrollments=Enrollment.query.order_by(Enrollment.enrolled_at.desc()).all(),
+        classes=ClassRoom.query.order_by(ClassRoom.grade, ClassRoom.name).all(),
+    )
+
+
+@admin_bp.route("/enrollments/<int:enrollment_id>/approve", methods=["POST"])
+@login_required
+@roles_required("admin")
+def approve_enrollment(enrollment_id):
+    enrollment = Enrollment.query.get_or_404(enrollment_id)
+    class_id = request.form.get("class_id", type=int)
+    if not class_id:
+        flash("សូមជ្រើសរើសថ្នាក់មុន approve។", "danger")
+        return redirect(url_for("admin.enrollments"))
+    class_room = ClassRoom.query.get_or_404(class_id)
+    enrollment.class_id = class_room.id
+    enrollment.status = "Active"
+    enrollment.student.class_id = class_room.id
+    from datetime import datetime
+    enrollment.approved_at = datetime.utcnow()
+    write_audit("approve", "enrollment", enrollment.id, enrollment.student.name)
+    db.session.commit()
+    flash("បាន approve ការចុះឈ្មោះ និង assign ថ្នាក់រួចរាល់។", "success")
+    return redirect(url_for("admin.enrollments"))
+
+
+@admin_bp.route("/enrollments/<int:enrollment_id>/reject", methods=["POST"])
+@login_required
+@roles_required("admin")
+def reject_enrollment(enrollment_id):
+    enrollment = Enrollment.query.get_or_404(enrollment_id)
+    enrollment.status = "Rejected"
+    enrollment.class_id = None
+    enrollment.student.class_id = None
+    write_audit("reject", "enrollment", enrollment.id, enrollment.student.name)
+    db.session.commit()
+    flash("បាន reject ការចុះឈ្មោះរួចរាល់។", "success")
+    return redirect(url_for("admin.enrollments"))
 
 
 @admin_bp.route("/schedule", methods=["GET", "POST"])

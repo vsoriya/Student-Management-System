@@ -3,7 +3,8 @@ from flask_login import current_user, login_required, login_user, logout_user
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
-from app.models import User
+from app.models import Enrollment, Student, User
+from app.students.forms import student_payload, validate_student
 from .forms import validate_register_form
 
 auth_bp = Blueprint("auth", __name__)
@@ -31,8 +32,12 @@ def register():
     if request.method == "POST":
         errors = validate_register_form(request.form)
         email = request.form.get("email", "").strip().lower()
+        student_data = student_payload(request.form)
+        errors.extend(validate_student(student_data))
         if User.query.filter_by(email=email).first():
             errors.append("អ៊ីមែលនេះមានរួចហើយ។")
+        if Student.query.filter_by(student_code=student_data["student_code"]).first():
+            errors.append("លេខកូដសិស្សនេះមានរួចហើយ។")
         if errors:
             for error in errors:
                 flash(error, "danger")
@@ -43,9 +48,14 @@ def register():
                 role="student",
             )
             user.set_password(request.form["password"])
+            student_data["class_id"] = None
+            student = Student(**student_data, user=user)
+            enrollment = Enrollment(student=student, status="Pending")
             db.session.add(user)
+            db.session.add(student)
+            db.session.add(enrollment)
             db.session.commit()
-            flash("បានបង្កើតគណនីរួចរាល់។ សូមចូលប្រើប្រាស់។", "success")
+            flash("បានបង្កើតគណនីរួចរាល់។ សូមរង់ចាំ admin approve ការចុះឈ្មោះចូលរៀន។", "success")
             return redirect(url_for("auth.login"))
     return render_template("register.html")
 

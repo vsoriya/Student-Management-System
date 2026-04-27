@@ -33,3 +33,23 @@ def write_audit(action, entity, entity_id=None, message=None):
                 message=message,
             )
         )
+
+
+def current_student_profile():
+    if not current_user.is_authenticated or current_user.role != "student":
+        return None
+
+    from sqlalchemy import or_
+    from .models import Student
+
+    linked_student = Student.query.filter_by(user_id=current_user.id).first()
+    if linked_student:
+        return linked_student
+
+    return Student.query.filter(
+        or_(
+            Student.student_code == current_user.email.split("@")[0],
+            Student.name == current_user.name,
+            Student.phone == current_user.email,
+        )
+    ).first()
