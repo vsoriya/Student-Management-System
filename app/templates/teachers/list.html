@@ -5,31 +5,33 @@
   <div>
     <span class="eyebrow">Teacher Management</span>
     <h1>គ្រូបង្រៀន</h1>
-    <p>គ្រប់គ្រងព័ត៌មានគ្រូ និងប្រើសម្រាប់ភ្ជាប់ទៅថ្នាក់ ឬមុខវិជ្ជា។</p>
+    <p>គ្រប់គ្រងព័ត៌មានគ្រូ និងបង្កើតគណនី login សម្រាប់គ្រូ។</p>
   </div>
 </header>
 <section class="split">
   <form method="post" class="form powerful-form">
     <h2>បន្ថែមគ្រូ</h2>
     <label>ឈ្មោះគ្រូ <input name="name" required></label>
-    <label>អ៊ីមែល <input type="email" name="email"></label>
+    <label>អ៊ីមែលសម្រាប់ Login <input type="email" name="email" required></label>
+    <label>ពាក្យសម្ងាត់ <input type="password" name="password" minlength="6" required></label>
     <label>ទូរស័ព្ទ <input name="phone"></label>
     <label>ជំនាញ <input name="specialty" placeholder="គណិតវិទ្យា"></label>
     <div class="form-footer"><button>រក្សាទុកគ្រូ</button></div>
   </form>
   <div class="table-card"><table>
-    <thead><tr><th>ឈ្មោះ</th><th>ជំនាញ</th><th>ទំនាក់ទំនង</th><th>ថ្នាក់</th><th>មុខវិជ្ជា</th><th></th></tr></thead>
+    <thead><tr><th>ឈ្មោះ</th><th>គណនី</th><th>ជំនាញ</th><th>ទំនាក់ទំនង</th><th>ថ្នាក់</th><th>មុខវិជ្ជា</th><th></th></tr></thead>
     <tbody>
       {% for teacher in teachers %}
       <tr>
         <td><span class="person-cell"><span class="avatar tiny">{{ teacher.name[:1]|upper }}</span><strong>{{ teacher.name }}</strong></span></td>
+        <td>{% if teacher.user %}<span class="score-badge">អាច Login</span>{% else %}<span class="code-pill">មិនទាន់មាន</span>{% endif %}<br><small>{{ teacher.email or "" }}</small></td>
         <td>{{ teacher.specialty or "មិនមាន" }}</td>
         <td>{{ teacher.phone or teacher.email or "មិនមាន" }}</td>
         <td><span class="score-badge">{{ teacher.classes|length }}</span></td>
         <td><span class="score-badge">{{ teacher.subjects|length }}</span></td>
         <td><form method="post" action="{{ url_for('teachers.delete_teacher', teacher_id=teacher.id) }}"><button class="danger small">លុប</button></form></td>
       </tr>
-      {% else %}<tr><td colspan="6">មិនទាន់មានគ្រូទេ។</td></tr>{% endfor %}
+      {% else %}<tr><td colspan="7">មិនទាន់មានគ្រូទេ។</td></tr>{% endfor %}
     </tbody>
   </table></div>
 </section>
